@@ -349,6 +349,7 @@ Los 6 `xfail` estan documentados con razon explicita: metrica ausente en dummy d
 
 - Embeddings semanticos para aliases robustos sin diccionario manual
 - Modelo estadistico de anomalias (z-score, IQR) sobre historia rolling
+- Inferencia causal: cuando el usuario pregunta "que podria explicar el crecimiento de X", correlacionar automaticamente la tendencia de esa metrica con otras metricas en el mismo periodo y zona para generar hipotesis accionables (ej: crecimiento de ordenes correlacionado con mejora simultanea de Lead Penetration)
 - Soporte multi-usuario con autenticacion basica
 - Conexion a warehouse (Snowflake, BigQuery) reemplazando el Excel
 - Containerizacion Docker para deploy reproducible
