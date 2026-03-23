@@ -135,6 +135,17 @@ Se eligio pandas en lugar de SQL por:
 - pandas permite inspeccionar y testear cada transformacion en aislamiento
 - la transicion a SQL/BigQuery en produccion es directa: reemplazar `_select_dataset()` en `query_engine.py`
 
+### Python nativo sobre plataformas no-code (n8n, Make, Zapier)
+
+| Criterio | Decision |
+|---|---|
+| Control del pipeline | Python permite controlar cada paso del flujo (routing → engine → narrator) con logica arbitraria, tests unitarios y trazabilidad completa. Las plataformas no-code abstraen ese control en nodos visuales que no son auditables ni testeables |
+| Logica analitica | El motor deterministico en `query_engine.py` requiere pandas, groupby, percentiles y logica condicional compleja. Ninguna plataforma no-code expone ese nivel de expresividad sin caer en "code nodes" que anulan la ventaja |
+| Testabilidad | 97 tests corren en segundos sobre el pipeline Python. Un workflow n8n no tiene cobertura de tests estandar |
+| Portabilidad | El pipeline es agnóstico a la interfaz: la misma logica puede servirse via Streamlit, FastAPI o CLI sin cambios. Un workflow no-code esta atado a la plataforma |
+| Produccion | En produccion real, el pipeline se conectaria a un warehouse (BigQuery, Snowflake) reemplazando una sola funcion. Migrar un workflow n8n es reescribirlo |
+| Uso apropiado de no-code | n8n es ideal para integraciones entre SaaS (Slack → Jira → Sheets). Para analitica con LLMs y logica de negocio compleja, Python es la herramienta correcta |
+
 ### Manejo de edge cases
 
 | Caso | Manejo |
