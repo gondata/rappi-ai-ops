@@ -14,14 +14,9 @@ from config import (
     EXPORTS_DIR,
     OPENAI_API_KEY,
     DEFAULT_MODEL_NAME,
-    SMTP_HOST,
-    SMTP_PORT,
-    SMTP_USERNAME,
-    SMTP_PASSWORD,
-    SMTP_FROM_EMAIL,
-    SMTP_USE_TLS,
     MEMORY_PERSIST_PATH,
     MEMORY_MAX_TURNS,
+    _get_secret,
 )
 from utils import (
     ensure_directories,
@@ -1323,12 +1318,12 @@ def render_bottom_bar() -> None:
     filename = st.session_state.report_export_filename
 
     smtp_settings = {
-        "host": SMTP_HOST,
-        "port": SMTP_PORT,
-        "username": SMTP_USERNAME,
-        "password": SMTP_PASSWORD,
-        "from_email": SMTP_FROM_EMAIL,
-        "use_tls": SMTP_USE_TLS,
+        "host": _get_secret("SMTP_HOST"),
+        "port": int(_get_secret("SMTP_PORT", "587")),
+        "username": _get_secret("SMTP_USERNAME"),
+        "password": _get_secret("SMTP_PASSWORD"),
+        "from_email": _get_secret("SMTP_FROM_EMAIL"),
+        "use_tls": _get_secret("SMTP_USE_TLS", "true").lower() in {"1", "true", "yes"},
     }
 
     col_csv, col_pdf, col_email = st.columns(3)
@@ -1370,7 +1365,7 @@ def render_bottom_bar() -> None:
             if not smtp_configured(smtp_settings):
                 st.info("Configurá SMTP en .env para habilitar el envío por mail.")
             else:
-                st.markdown(f'<p style="font-size:0.82rem;color:#344054;margin-bottom:0.4rem;">Se enviará desde <b>{SMTP_FROM_EMAIL}</b></p>', unsafe_allow_html=True)
+                st.markdown(f'<p style="font-size:0.82rem;color:#344054;margin-bottom:0.4rem;">Se enviará desde <b>{smtp_settings["from_email"]}</b></p>', unsafe_allow_html=True)
                 recipient = st.text_input("Destinatario", key="bar_email_to", placeholder="nombre@empresa.com")
                 if st.button("Enviar PDF", key=f"bar_send_{filename}", use_container_width=True):
                     if not recipient.strip():
@@ -1610,12 +1605,12 @@ def render_executive_report_actions(report: dict) -> None:
     pdf_bytes = build_executive_report_pdf(report)
     filename = st.session_state.report_export_filename
     smtp_settings = {
-        "host": SMTP_HOST,
-        "port": SMTP_PORT,
-        "username": SMTP_USERNAME,
-        "password": SMTP_PASSWORD,
-        "from_email": SMTP_FROM_EMAIL,
-        "use_tls": SMTP_USE_TLS,
+        "host": _get_secret("SMTP_HOST"),
+        "port": int(_get_secret("SMTP_PORT", "587")),
+        "username": _get_secret("SMTP_USERNAME"),
+        "password": _get_secret("SMTP_PASSWORD"),
+        "from_email": _get_secret("SMTP_FROM_EMAIL"),
+        "use_tls": _get_secret("SMTP_USE_TLS", "true").lower() in {"1", "true", "yes"},
     }
 
     col_download, col_save = st.columns([0.7, 0.3])
@@ -1641,7 +1636,7 @@ def render_executive_report_actions(report: dict) -> None:
             )
             return
 
-        st.markdown(f'<p style="font-size:0.82rem;color:#344054;margin-bottom:0.4rem;">Se enviará desde <b>{SMTP_FROM_EMAIL}</b> usando {SMTP_HOST}:{SMTP_PORT}.</p>', unsafe_allow_html=True)
+        st.markdown(f'<p style="font-size:0.82rem;color:#344054;margin-bottom:0.4rem;">Se enviará desde <b>{smtp_settings["from_email"]}</b> usando {smtp_settings["host"]}:{smtp_settings["port"]}.</p>', unsafe_allow_html=True)
 
         default_subject = "Reporte Ejecutivo - Rappi AI Operations Assistant"
         default_body = (
